@@ -7,17 +7,13 @@ require('dotenv').config()
 
 const app = express()
 
-// Rutas
 
 // Directorio publico
-app.use( express.static('public') )
+app.use(express.static('public'))
 
-// app.get('/',(req, res)=>{
+// Rutas
 
-//     res.json({
-//         ok: true
-//     })
-// })
+app.use('/api/auth', require('./routes/auth'))
 
 // Escuchar peticiones
 
