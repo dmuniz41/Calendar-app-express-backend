@@ -2,23 +2,38 @@ const {response} = require('express')
 
 const createUser = (req, res = response)=>{
 
-    res.json({
+    const {name, email, password} = req.body
+
+    if(name.length < 5){
+        return res.status(400).json({
+            ok: false,
+            msg: "El nonmbre debe ser de al menos 5 letras "
+        })
+    }
+
+    return res.status(201).json({
         ok: true,
-        msg: 'registro'
+        msg: 'registro',
+        name,
+        email,
+        password
     })
 }
 
 const loginUser = (req, res = response)=>{
 
-    res.json({
+    const { email, password} = req.body
+
+    return res.json({
         ok: true,
-        msg: 'login'
+        msg: 'login',
+        email, password
     })
 }
 
 const renewToken = (req, res = response)=>{
 
-    res.json({
+    return res.json({
         ok: true,
         msg: 'renew'
     })
