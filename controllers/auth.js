@@ -4,16 +4,26 @@ const User = require('../models/User')
 
 const createUser = async(req, res = response)=>{
 
-    // const {name, email, password} = req.body
+    const {email, password} = req.body
 
     try {
 
-        const user = new User(req.body)
+        let user = await User.findOne({email})
+
+        if(user){
+            return res.status(400).json({
+                ok: false, 
+                msg: 'Ya existe un usuario con este correo'
+            })
+        }
+
+        user = new User(req.body)
         await user.save();
     
         return res.status(201).json({
             ok: true,
-            msg: 'registro',
+            uid: user.id,
+            name: user.name
         })
 
     } catch (error) {
@@ -23,7 +33,6 @@ const createUser = async(req, res = response)=>{
             msg: 'Problemas al grabar en BD'
         })
     }
-
 }
 
 const loginUser = (req, res = response)=>{
