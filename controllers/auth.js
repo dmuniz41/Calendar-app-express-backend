@@ -22,7 +22,7 @@ const createUser = async(req, res = response)=>{
         //Ecriptar contrasenna
         const salt = bcrypt.genSaltSync()
         user.password = bcrypt.hashSync(password,salt)
-        
+
         await user.save();
     
         return res.status(201).json({
@@ -40,15 +40,45 @@ const createUser = async(req, res = response)=>{
     }
 }
 
-const loginUser = (req, res = response)=>{
+const loginUser = async(req, res = response)=>{
 
     const { email, password} = req.body
 
-    return res.json({
-        ok: true,
-        msg: 'login',
-        email, password
-    })
+    try {
+        const user = await User.findOne({email})
+
+        if(!user){
+            return res.status(400).json({
+                ok: false, 
+                msg: 'El usuario no existe con ese email'
+            })
+        }
+
+        // Confirmar contrasennas
+        const validPassword = bcrypt.compareSync(password,user.password)
+        if(!validPassword){
+            res.status(400).json({
+                ok: false,
+                msg: 'Contrasenna incorrecta'
+            })
+        }
+        
+        // Generar JWT
+        
+        res.status(200).json({
+            ok: true,
+            uid: user.id,
+            name: user.name
+        })
+
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'Problemas al grabar en BD'
+        })
+    }
 }
 
 const renewToken = (req, res = response)=>{
