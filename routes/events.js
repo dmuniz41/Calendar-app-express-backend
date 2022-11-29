@@ -5,19 +5,30 @@
 
 const { Router } = require('express')
 const { validateJWT } = require('../middlewares/validate_JWT')
-const {  createEvent,getEvents,deleteEvent,updateEvent} = require("../controllers/events")
+const { fieldValidator } =require('../middlewares/field-validator')
+const { isDate } = require('../helpers/isDate')
+const { createEvent,getEvents,deleteEvent,updateEvent} = require("../controllers/events")
+const { check } = require('express-validator')
 
 
 const router  = Router()
 
+router.use(validateJWT)
 
 // Obtener eventos
-router.get('/',validateJWT, getEvents)
+router.get('/', getEvents)
 // Crear nuevo evento
-router.post('/',validateJWT, createEvent)
+router.post('/',
+    [
+        // check('title', 'El titulo es obligatorio').not().isEmpty(),
+        check('start', 'Fecha de inicio obligatoria').custom(isDate),
+        check('end', 'Fecha de finalizacion obligatoria').custom(isDate),
+        fieldValidator,
+    ],
+    createEvent)
 // Actualizar evento
-router.put('/',validateJWT, updateEvent)
+router.put('/:id', updateEvent)
 // Borrar evento
-router.delete('/:id',validateJWT, deleteEvent)
+router.delete('/:id', deleteEvent)
 
 module.exports = router
